@@ -16,6 +16,7 @@ import os
 import tempfile
 from scipy.optimize import minimize
 
+# This function has partially taken from the program in Louart, Liao, Couillet (2018)
 def gen_data(Tr,Te,prop):
     mnist=fetch_openml('mnist_784', cache=False)
     X,y = mnist.data.astype('float32'),mnist.target.astype('int64')
@@ -50,22 +51,20 @@ def gen_data(Tr,Te,prop):
             
     return X_train, X_test, y_train, y_test
         
-n=512
-p=784
-Tr=1024           
-Te=Tr    
+n=512     #neurons
+p=784     #dimension 
+Tr=1024   #number of training points   
+Te=Tr     #number of testing points
 
 prop=[.5,.5]      
         
 
-X_train, X_test, Y_train, Y_test = gen_data(Tr,Te,prop)
+X_train, X_test, Y_train, Y_test = gen_data(Tr,Te,prop)   #data generated
 
-######################### datos de enetrenamiento ########
-# Datos de entrenamiento numero
+######################### training data ########
 T = X_train.shape[1]
 
-######################### datos de prueba ########
-# Datos de prueba numero
+######################### testing data ########
 h_T = X_test.shape[1]
 
 #### reescalando
@@ -94,7 +93,7 @@ I_n=np.identity(n)
 SIGMA=np.abs( W@X_train )
 
 
-#### beta estimadA
+#### beta estimada
 def h_beta(gamma):   # def nombre_de_la_funcion(variable1,...,variablen): enter y definir
     return ( (1/T)*sp.linalg.inv( (1/T)*SIGMA@np.transpose(SIGMA)+gamma*I_n )@SIGMA@np.transpose(Y_train) )
 
@@ -156,16 +155,6 @@ def Qtest(gamma):
     yi=np.reshape( Y_test[:,i],(1,1) )
     Q_aux=Q_aux+((zi@np.transpose(zi)@h_beta(gamma)-zi@np.transpose(yi)+gamma*h_beta(gamma))@np.transpose( zi@np.transpose(zi)@h_beta(gamma)-zi@np.transpose(yi) ) )
   return( (1/h_T)*Q_aux )
- 
-
-  #def Qtest(gamma):
-#    Q_aux=np.array( [[0]*n]*n )
-#    for i in range(h_T):
-#        zi=np.reshape(h_SIGMA[:,i],( h_SIGMA.shape[0] ,1))
-#        yi=np.reshape( Y_test[:,i],(1,1) )
-#        s=zi@np.transpose(zi)@h_beta(gamma)-zi@np.transpose(yi)
-#        Q_aux=Q_aux+(  (s)@np.transpose(s)+gamma*h_beta(gamma)@np.transpose(s) ) 
-#    return( (1/T)*Q_aux )
 
 
 #### GIC de prueba      
@@ -182,17 +171,7 @@ def GICtest(gamma):
 ### R,Q no verdaderas s conocido
 
 def Rtrain(gamma):
-  return( ((1/T)* SIGMA@np.transpose(SIGMA) +gamma*I_n) )
-
-#def Qtrain(gamma):
-#    Q_aux=np.array( [[0]*n]*n )
-#    for i in range(T):
-#        zi=np.reshape(SIGMA[:,i],( SIGMA.shape[0] ,1))
-#        yi=np.reshape( Y_train[:,i],(1,1) )
-#        s=zi@np.transpose(zi)@h_beta(gamma)-zi@np.transpose(yi)
-#        Q_aux=Q_aux+(  (s)@np.transpose(s)+gamma*h_beta(gamma)@np.transpose(s) ) 
-#    return( (1/T)*Q_aux )
-  
+  return( ((1/T)* SIGMA@np.transpose(SIGMA) +gamma*I_n) )  
 
 def Qtrain(gamma):
   Q_aux=np.array( [[0]*n]*n )
@@ -253,7 +232,7 @@ end_th_calculus-start_th_calculus
 
 sp.optimize.minimize( GICtest,145)
 
-########################## Generalized Cross-Validation
+########################## Generalized Cross-Validation  ####### some future work
 I_T=np.identity(T)
 I_h_T=np.identity(h_T)
 
