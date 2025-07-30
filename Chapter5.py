@@ -12,7 +12,7 @@ from keras import initializers
 import numpy as np
 import matplotlib.pyplot as plt
 import keras
-
+# this is a test
 import math
 
 ### usando GPU
